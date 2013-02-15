@@ -1,0 +1,4 @@
+include *.txt
+include AUTHORS
+recursive-include xanax_grappelli/static *
+recursive-include xanax_grappelli/templates *

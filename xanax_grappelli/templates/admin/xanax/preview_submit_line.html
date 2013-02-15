@@ -1,0 +1,133 @@
+{% if is_admin_preview %}
+
+    {% load i18n %}
+    {% load xanax_tags %}
+    {% load url from future  %}
+    {% load admin_urls %}{% load admin_static %}{% load url from future %}{% load i18n grp_tags %}`
+
+    <link href="{% static "grappelli/jquery/ui/css/custom-theme/jquery-ui-1.8.18.custom.css" %}" rel="stylesheet" type="text/css" media="screen" />
+    <link href="{% static "grappelli/stylesheets/screen.css" %}" rel="stylesheet" type="text/css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}xanax/css/grappelli_preview.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <div id="preview-header-back"></div>
+
+    <header class="" id="grp-header">
+        <!-- NAVIGATION -->
+        <div id="grp-navigation">
+            <h1 id="grp-admin-title">Grappelli</h1>
+            <ul id="grp-user-tools">
+                <!-- Username -->
+                <li class="grp-user-options-container grp-collapse grp-closed">
+                    <ul class="grp-user-options">
+                        <!-- Change Password -->
+                        <li><a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a></li>
+                        <!-- Logout -->
+                        <li><a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a></li>
+                    </ul>
+                </li>
+                <!-- Userlinks -->
+                <!-- JS tests -->
+                <!-- Documentation -->
+            </ul>
+        </div>
+        <script charset="utf-8" type="text/javascript">
+            (function($) {
+                $(document).ready(function() {
+                    $("#grp-navigation .grp-collapse").grp_collapsible();
+                });
+            })(grp.jQuery);
+        </script>
+        <!-- CONTEXT NAVIGATION -->
+        <div id="grp-context-navigation">
+            <nav class="" id="grp-breadcrumbs">
+                <header style="display:none"><h1>Breadcrumbs</h1></header>
+                <ul>
+                    <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+                    <li><a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst|escape }}</a></li>
+                    <li><a href="{% url opts|admin_urlname:'changelist' %}">{{ module_name }}</a></li>
+                    <li><a href="{% url opts|admin_urlname:'changelist' %}{{ object.pk }}">{{ object|truncatewords:"18" }}</a></li>
+                    <li>{% trans 'Preview' %}</li>
+                </ul>
+            </nav>
+            <nav id="grp-page-tools">
+                <header style="display:none"><h1>Page Tools</h1></header>
+                <ul>
+                    <li><a title="Open All Items" id="grp-open-all" class="grp-tool" href="javascript://">&nbsp;</a></li>
+                    <li><a title="Close All Items" id="grp-close-all" class="grp-tool" href="javascript://">&nbsp;</a></li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+
+
+    <form id="changelist-form" action="{{ preview_action }}" method="post">
+    <div id="preview-submit-row" class="grp-module grp-submit-row grp-fixed-footer">
+
+            {% csrf_token %}
+            {% preview_token %}
+            <ul>
+                {% if show_edit_link %}<li><a href="../" class="grp-button grp-default">{% trans "Edit" %}</a></li>{% endif %}
+                {% if show_back_link %}<li class="grp-float-left" ><a href="../../" class="grp-button">{% trans 'Back' %}</a></li>{% endif %}
+                {% if show_delete_link %}<li class="grp-float-left" ><a href="{% if not is_post %}../{% endif %}delete/" class="grp-button grp-delete-link">{% trans "Delete" %}</a></li>{% endif %}
+
+                {% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" {{ onclick_attrib }}/>{% endif %}
+                {% if show_back %}<input type="submit" value="{% trans 'Back' %}" style="margin-right: 45px;float: left" class="default" name="_back" {{ onclick_attrib }}/>{% endif %}
+
+                {% if show_publish %}<input type="submit" value="{% trans 'Publish' %}" class="default" name="_publish" {{ onclick_attrib }}/>{% endif %}
+                {% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" {{ onclick_attrib }}/>{%endif%}
+                {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" {{ onclick_attrib }} />{% endif %}
+                {% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
+            </ul>
+
+    </div>
+    </form>
+    <div id="preview-submit-row-back"></div>
+
+    <script>
+
+        $(document).ready(function(){
+
+            var preview_top_height =
+                    $('#grp-header').height()
+                    +parseInt($('#grp-header').css('padding-top').split('px')[0])
+                    +parseInt($('#grp-header').css('padding-bottom').split('px')[0]);
+
+            var preview_bottom_height =
+                    $('#preview-submit-row').height()
+                    +parseInt($('#preview-submit-row').css('padding-top').split('px')[0])
+                    +parseInt($('#preview-submit-row').css('padding-bottom').split('px')[0]);
+
+            $('body *:first').before($('#preview-header-back'));
+            $('body').append($('#preview-submit-row-back'));
+
+            $('#preview-submit-row-back').height(preview_bottom_height);
+            $('#preview-header-back').height(preview_top_height);
+
+            $('#preview-header-back').after($('#grp-header'));
+            $('#preview-submit-row-back').before($('#preview-submit-row'));
+            var body_bacground =  $('body').css('background-position');
+            $('body').css('background-position', body_bacground.split(' ')[0] + ' ' + preview_top_height + 'px');
+            $('*').each(function( index ) {
+                if ($(this).css('position') == 'fixed'){
+                    if ($(this).css('bottom')!='auto') {
+                        $(this).css('bottom', (parseInt($(this).css('bottom').split('px')[0])+preview_bottom_height)+'px');
+                    } else {
+                    if ($(this).css('top')!='auto') {
+                       $(this).css('top', (parseInt($(this).css('top').split('px')[0])+preview_top_height)+'px');
+                    }
+                    }
+                }
+            });
+            $('#grp-header').css('bottom', 'auto').css('top', '0px');
+            $('#preview-submit-row').css('bottom', '0px').css('top', 'auto');
+
+
+        });
+
+
+
+    </script>
+{% endif %}

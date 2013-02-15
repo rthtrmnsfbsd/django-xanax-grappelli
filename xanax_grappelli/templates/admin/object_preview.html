@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+{% load xanax_tags %}
+
+{% block content %}
+    {{ block.super }}
+    {% preview_submit_row %}
+{% endblock %}
